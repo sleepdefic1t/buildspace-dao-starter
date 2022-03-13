@@ -41,8 +41,7 @@ const App = () => {
 
 	// A fancy function to shorten someones wallet address, no need to show the whole thing.
 	const shortenAddress = (str) => {
-		return str;
-		// return str.substring(0, 6) + "..." + str.substring(str.length - 4);
+		return str.substring(0, 6) + "..." + str.substring(str.length - 4);
 	};
 
 	// This useEffect grabs all our the addresses of our members holding our NFT.
@@ -51,17 +50,22 @@ const App = () => {
 			return;
 		}
 
-		// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
-		// with tokenId 0.
-		bundleDropModule
-			.getAllClaimerAddresses("0")
-			.then((addresess) => {
-				console.log("🚀 Members addresses", addresess);
-				setMemberAddresses(addresess);
-			})
-			.catch((err) => {
-				console.error("failed to get member list", err);
-			});
+		const handleClaimerAddresses = async () => {
+			// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
+			// with tokenId 0.
+			await bundleDropModule
+				.getAllClaimerAddresses("0")
+				.then((addresess) => {
+					console.log("🚀 Members addresses", addresess);
+					setMemberAddresses(addresess);
+				})
+				.catch((err) => {
+					console.error("failed to get member list", err);
+				});
+		}
+
+		handleClaimerAddresses()
+			.catch(console.error);
 	}, [hasClaimedNFT]);
 
 	// This useEffect grabs the # of token each member holds.
@@ -70,16 +74,21 @@ const App = () => {
 			return;
 		}
 
-		// Grab all the balances.
-		tokenModule
-			.getAllHolderBalances()
-			.then((amounts) => {
-				console.log("👜 Amounts", amounts);
-				setMemberTokenAmounts(amounts);
-			})
-			.catch((err) => {
-				console.error("failed to get token amounts", err);
-			});
+		const handleHolderBalances = async () => {
+			// Grab all the balances.
+			tokenModule
+				.getAllHolderBalances()
+				.then((amounts) => {
+					console.log("👜 Amounts", amounts);
+					setMemberTokenAmounts(amounts);
+				})
+				.catch((err) => {
+					console.error("failed to get token amounts", err);
+				});
+		}
+
+		handleHolderBalances()
+			.catch(console.error);
 	}, [hasClaimedNFT]);
 
 	// Now, we combine the memberAddresses and memberTokenAmounts into a single array
@@ -99,30 +108,43 @@ const App = () => {
 
 	// Another useEffect!
 	useEffect(() => {
-		// We pass the signer to the sdk, which enables us to interact with
-		// our deployed contract!
-		sdk.setProviderOrSigner(signer);
+		const setSigner = async () => {
+			// We pass the signer to the sdk, which enables us to interact with
+			// our deployed contract!
+			await sdk.setProviderOrSigner(signer);
+		}
+		
+		setSigner()
+			.catch(console.error);
 	}, [signer]);
 
 	useEffect(() => {
 		if (!address) {
 			return;
 		}
-		return bundleDropModule
-			.balanceOf(address, "0")
-			.then((balance) => {
-				if (balance.gt(0)) {
-					setHasClaimedNFT(true);
-					console.log("🌟 this user has a membership NFT!");
-				} else {
+
+		const hasClaimed = async () => {
+			const handleHasClaimed = await bundleDropModule
+				.balanceOf(address, "0")
+				.then((balance) => {
+					if (balance.gt(0)) {
+						setHasClaimedNFT(true);
+						console.log("🌟 this user has a membership NFT!");
+					} else {
+						setHasClaimedNFT(false);
+						console.log("😭 this user doesn't have a membership NFT.");
+					}
+				})
+				.catch((error) => {
 					setHasClaimedNFT(false);
-					console.log("😭 this user doesn't have a membership NFT.");
-				}
-			})
-			.catch((error) => {
-				setHasClaimedNFT(false);
-				console.error("failed to nft balance", error);
-			});
+					console.error("failed to nft balance", error);
+				});
+
+			return handleHasClaimed;
+		}
+
+		const result = hasClaimed()
+    			.catch(console.error);
 	}, [address]);
 
 	const [proposals, setProposals] = useState([]);
@@ -134,17 +156,23 @@ const App = () => {
 		if (!hasClaimedNFT) {
 			return;
 		}
-		// A simple call to voteModule.getAll() to grab the proposals.
-		voteModule
-			.getAll()
-			.then((proposals) => {
-				// Set state!
-				setProposals(proposals);
-				console.log("🌈 Proposals:", proposals);
-			})
-			.catch((err) => {
-				console.error("failed to get proposals", err);
-			});
+
+		const handleProposals = async () => {
+			// A simple call to voteModule.getAll() to grab the proposals.
+			await voteModule
+				.getAll()
+				.then((proposals) => {
+					// Set state!
+					setProposals(proposals);
+					console.log("🌈 Proposals:", proposals);
+				})
+				.catch((err) => {
+					console.error("failed to get proposals", err);
+				});
+		}
+
+		handleProposals()
+			.catch(console.error);
 	}, [hasClaimedNFT]);
 
 	// We also need to check if the user already voted.
@@ -159,16 +187,20 @@ const App = () => {
 			return;
 		}
 
-		// Check if the user has already voted on the first proposal.
-		voteModule
-			.hasVoted(proposals[0].proposalId, address)
-			.then((hasVoted) => {
-				setHasVoted(hasVoted);
-				console.log("🥵 User has already voted");
-			})
-			.catch((err) => {
-				console.error("failed to check if wallet has voted", err);
-			});
+		const handleHasVoted = async () => {
+			// Check if the user has already voted on the first proposal.
+			await voteModule
+				.hasVoted(proposals[0].proposalId, address)
+				.then((hasVoted) => {
+					setHasVoted(hasVoted);
+					console.log("🥵 User has already voted");
+				})
+				.catch((err) => {
+					console.error("failed to check if wallet has voted", err);
+				});
+		}
+
+		handleHasVoted();
 	}, [hasClaimedNFT, proposals, address]);
 
 	if (error instanceof UnsupportedChainIdError) {
