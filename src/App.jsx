@@ -26,33 +26,25 @@ const App = () => {
 	const { connectWallet, address, error, provider } = useWeb3();
 	console.log("👋 Address:", address);
 
-	// The signer is required to sign transactions on the blockchain.
-	// Without it we can only read data, not write.
 	const signer = provider ? provider.getSigner() : undefined;
 
 	const [hasClaimedNFT, setHasClaimedNFT] = useState(false);
-	// isClaiming lets us easily keep a loading state while the NFT is minting.
 	const [isClaiming, setIsClaiming] = useState(false);
 
-	// Holds the amount of token each member has in state.
 	const [memberTokenAmounts, setMemberTokenAmounts] = useState({});
-	// The array holding all of our members addresses.
 	const [memberAddresses, setMemberAddresses] = useState([]);
 
-	// A fancy function to shorten someones wallet address, no need to show the whole thing.
 	const shortenAddress = (str) => {
 		return str.substring(0, 6) + "..." + str.substring(str.length - 4);
 	};
+	
 
-	// This useEffect grabs all our the addresses of our members holding our NFT.
 	useEffect(() => {
 		if (!hasClaimedNFT) {
 			return;
 		}
 
 		const handleClaimerAddresses = async () => {
-			// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
-			// with tokenId 0.
 			await bundleDropModule
 				.getAllClaimerAddresses("0")
 				.then((addresess) => {
@@ -64,11 +56,18 @@ const App = () => {
 				});
 		}
 
-		handleClaimerAddresses()
+		const res = handleClaimerAddresses()
 			.catch(console.error);
-	}, [hasClaimedNFT]);
+			
+		alert("memberAddresses: " + memberAddresses + "--res: " + res);
+		console.log("memberAddresses: " + memberAddresses + "--res: " + res);
+	
+			
+	}, [hasClaimedNFT, memberAddresses]);
+	
 
-	// This useEffect grabs the # of token each member holds.
+		  
+
 	useEffect(() => {
 		if (!hasClaimedNFT) {
 			return;
@@ -91,26 +90,24 @@ const App = () => {
 			.catch(console.error);
 	}, [hasClaimedNFT]);
 
-	// Now, we combine the memberAddresses and memberTokenAmounts into a single array
+
 	const memberList = useMemo(() => {
-		return memberAddresses.map((address) => {
+		const mapped = memberAddresses.map((address) => {
 			return {
 				address,
 				tokenAmount: ethers.utils.formatUnits(
-					// If the address isn't in memberTokenAmounts, it means they don't
-					// hold any of our token.
 					memberTokenAmounts[address] || 0,
 					18
 				),
 			};
 		});
+		
+		return mapped;
 	}, [memberAddresses, memberTokenAmounts]);
 
-	// Another useEffect!
+
 	useEffect(() => {
 		const setSigner = async () => {
-			// We pass the signer to the sdk, which enables us to interact with
-			// our deployed contract!
 			await sdk.setProviderOrSigner(signer);
 		}
 		
@@ -123,7 +120,7 @@ const App = () => {
 			return;
 		}
 
-		const hasClaimed = async () => {
+		const hasClaimed2 = async () => {
 			const handleHasClaimed = await bundleDropModule
 				.balanceOf(address, "0")
 				.then((balance) => {
@@ -143,9 +140,13 @@ const App = () => {
 			return handleHasClaimed;
 		}
 
-		const result = hasClaimed()
+		const result = hasClaimed2()
     			.catch(console.error);
-	}, [address]);
+
+		alert("hasClaimedNFT: " + hasClaimedNFT + " | result: " + result);
+		console.log("hasClaimedNFT: " + hasClaimedNFT);
+	
+	}, [address, hasClaimedNFT]);
 
 	const [proposals, setProposals] = useState([]);
 	const [isVoting, setIsVoting] = useState(false);
@@ -200,8 +201,14 @@ const App = () => {
 				});
 		}
 
-		handleHasVoted();
-	}, [hasClaimedNFT, proposals, address]);
+		const hasVoted2 = handleHasVoted();
+		
+		alert("hasVoted2: " + hasVoted2);
+		alert("hasVoted2: " + hasVoted2);
+		console.log("hasVoted: " + hasVoted);
+		console.log("hasVoted: " + hasVoted);	
+	
+	}, [hasClaimedNFT, proposals, address, hasVoted]);
 
 	if (error instanceof UnsupportedChainIdError) {
 		return (
@@ -399,24 +406,32 @@ const App = () => {
 			<button
 				disabled={isClaiming}
 				onClick={() => {
-					setIsClaiming(true);
-					// Call bundleDropModule.claim("0", 1) to mint nft to user's wallet.
-					bundleDropModule
-						.claim("0", 1)
-						.catch((err) => {
-							console.error("failed to claim", err);
-							setIsClaiming(false);
-						})
-						.finally(() => {
-							// Stop loading state.
-							setIsClaiming(false);
-							// Set claim state.
-							setHasClaimedNFT(true);
-							// Show user their fancy new NFT!
-							console.log(
-								`Successfully Minted! Check it our on OpenSea: https://testnets.opensea.io/assets/${bundleDropModule.address}/0`
-							);
-						});
+
+					const handleIsClaiming = async () => {
+						setIsClaiming(true);
+						// Call bundleDropModule.claim("0", 1) to mint nft to user's wallet.
+						await bundleDropModule
+							.claim("0", 1)
+							.catch((err) => {
+								console.error("failed to claim", err);
+								setIsClaiming(false);
+							})
+							.finally(() => {
+								// Stop loading state.
+								setIsClaiming(false);
+								// Set claim state.
+								setHasClaimedNFT(true);
+								// Show user their fancy new NFT!
+								console.log(
+									`Successfully Minted! Check it our on OpenSea: https://testnets.opensea.io/assets/${bundleDropModule.address}/0`
+								);
+							});
+					}
+		
+					const claiming = handleIsClaiming();
+					alert("claiming: " + claiming);
+					console.log("claiming: " + claiming);	
+					
 				}}
 			>
 				{isClaiming ? "Minting..." : "Mint your nft (FREE)"}
