@@ -53,8 +53,9 @@ const App = () => {
 	  
 	  // Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
 	  // with tokenId 0.
+	  const memberAddresses = await bundleDropModule.getAllClaimerAddresses("0");
+ 
 	  try {
-	    const memberAddresses = await bundleDropModule.getAllClaimerAddresses("0");
 	    setMemberAddresses(memberAddresses);
 	    console.log("🚀 Members addresses", memberAddresses);
 	  } catch (error) {
@@ -91,23 +92,19 @@ const App = () => {
 		if (!hasClaimedNFT) {
 			return;
 		}
-
-		const handleHolderBalances = async () => {
-			// Grab all the balances.
-			tokenModule
-				.getAllHolderBalances()
-				.then((amounts) => {
-					console.log("👜 Amounts", amounts);
-					setMemberTokenAmounts(amounts);
-				})
-				.catch((err) => {
-					console.error("failed to get token amounts", err);
-				});
-		}
-
-		handleHolderBalances()
-			.catch(console.error);
+	
+		// Grab all the balances.
+		tokenModule
+			.getAllHolderBalances()
+			.then((amounts) => {
+				console.log("👜 Amounts", amounts);
+				setMemberTokenAmounts(amounts);
+			})
+			.catch((err) => {
+				console.error("failed to get token amounts", err);
+			});
 	}, [hasClaimedNFT]);
+
 
 	// Now, we combine the memberAddresses and memberTokenAmounts into a single array
 	const memberList = useMemo(() => {
@@ -126,44 +123,33 @@ const App = () => {
 
 	// Another useEffect!
 	useEffect(() => {
-		const setSigner = async () => {
-			// We pass the signer to the sdk, which enables us to interact with
-			// our deployed contract!
-			await sdk.setProviderOrSigner(signer);
-		}
-		
-		setSigner()
-			.catch(console.error);
+		// We pass the signer to the sdk, which enables us to interact with
+		// our deployed contract!
+	    sdk.setProviderOrSigner(signer);
 	}, [signer]);
 
 	useEffect(() => {
 		if (!address) {
 			return;
 		}
-
-		const hasClaimed = async () => {
-			const handleHasClaimed = await bundleDropModule
-				.balanceOf(address, "0")
-				.then((balance) => {
-					if (balance.gt(0)) {
-						setHasClaimedNFT(true);
-						console.log("🌟 this user has a membership NFT!");
-					} else {
-						setHasClaimedNFT(false);
-						console.log("😭 this user doesn't have a membership NFT.");
-					}
-				})
-				.catch((error) => {
+	
+		return bundleDropModule
+			.balanceOf(address, "0")
+			.then((balance) => {
+				if (balance.gt(0)) {
+					setHasClaimedNFT(true);
+					console.log("🌟 this user has a membership NFT!");
+				} else {
 					setHasClaimedNFT(false);
-					console.error("failed to nft balance", error);
-				});
-
-			return handleHasClaimed;
-		}
-
-		const result = hasClaimed()
-    			.catch(console.error);
+					console.log("😭 this user doesn't have a membership NFT.");
+				}
+			})
+			.catch((error) => {
+				setHasClaimedNFT(false);
+				console.error("failed to nft balance", error);
+			});
 	}, [address]);
+
 
 	const [proposals, setProposals] = useState([]);
 	const [isVoting, setIsVoting] = useState(false);
@@ -175,22 +161,17 @@ const App = () => {
 			return;
 		}
 
-		const handleProposals = async () => {
-			// A simple call to voteModule.getAll() to grab the proposals.
-			await voteModule
-				.getAll()
-				.then((proposals) => {
-					// Set state!
-					setProposals(proposals);
-					console.log("🌈 Proposals:", proposals);
-				})
-				.catch((err) => {
-					console.error("failed to get proposals", err);
-				});
-		}
-
-		handleProposals()
-			.catch(console.error);
+		// A simple call to voteModule.getAll() to grab the proposals.
+		voteModule
+			.getAll()
+			.then((proposals) => {
+				// Set state!
+				setProposals(proposals);
+				console.log("🌈 Proposals:", proposals);
+			})
+			.catch((err) => {
+				console.error("failed to get proposals", err);
+			});
 	}, [hasClaimedNFT]);
 
 	// We also need to check if the user already voted.
@@ -205,23 +186,20 @@ const App = () => {
 			return;
 		}
 
-		const handleHasVoted = async () => {
-			// Check if the user has already voted on the first proposal.
-			await voteModule
-				.hasVoted(proposals[0].proposalId, address)
-				.then((hasVoted) => {
-					setHasVoted(hasVoted);
-					console.log("🥵 User has already voted");
-				})
-				.catch((err) => {
-					console.error("failed to check if wallet has voted", err);
-				});
-		}
-
-		handleHasVoted();
+		// Check if the user has already voted on the first proposal.
+		voteModule
+			.hasVoted(proposals[0].proposalId, address)
+			.then((hasVoted) => {
+				setHasVoted(hasVoted);
+				console.log("🥵 User has already voted");
+			})
+			.catch((err) => {
+				console.error("failed to check if wallet has voted", err);
+			});
 	}, [hasClaimedNFT, proposals, address]);
 
-	if (error instanceof UnsupportedChainIdError) {
+
+	if (error && error.name === "UnsupportedChainIdError") {
 		return (
 			<div className="unsupported-network">
 				<h2>Please connect to Rinkeby</h2>
