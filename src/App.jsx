@@ -44,29 +44,47 @@ const App = () => {
 		return str.substring(0, 6) + "..." + str.substring(str.length - 4);
 	};
 
-	// This useEffect grabs all our the addresses of our members holding our NFT.
-	useEffect(() => {
-		if (!hasClaimedNFT) {
-			return;
-		}
 
-		const handleClaimerAddresses = async () => {
-			// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
-			// with tokenId 0.
-			await bundleDropModule
-				.getAllClaimerAddresses("0")
-				.then((addresess) => {
-					console.log("🚀 Members addresses", addresess);
-					setMemberAddresses(addresess);
-				})
-				.catch((err) => {
-					console.error("failed to get member list", err);
-				});
-		}
-
-		handleClaimerAddresses()
-			.catch(console.error);
+	// This useEffect grabs all the addresses of our members holding our NFT.
+	useEffect(async () => {
+	  if (!hasClaimedNFT) {
+	    return;
+	  }
+	  
+	  // Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
+	  // with tokenId 0.
+	  try {
+	    const memberAddresses = await bundleDropModule.getAllClaimerAddresses("0");
+	    setMemberAddresses(memberAddresses);
+	    console.log("🚀 Members addresses", memberAddresses);
+	  } catch (error) {
+	    console.error("failed to get member list", error);
+	  }
 	}, [hasClaimedNFT]);
+
+	// // This useEffect grabs all our the addresses of our members holding our NFT.
+	// useEffect(() => {
+	// 	if (!hasClaimedNFT) {
+	// 		return;
+	// 	}
+	//
+	// 	const handleClaimerAddresses = async () => {
+	// 		// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
+	// 		// with tokenId 0.
+	// 		await bundleDropModule
+	// 			.getAllClaimerAddresses("0")
+	// 			.then((addresess) => {
+	// 				console.log("🚀 Members addresses", addresess);
+	// 				setMemberAddresses(addresess);
+	// 			})
+	// 			.catch((err) => {
+	// 				console.error("failed to get member list", err);
+	// 			});
+	// 	}
+	//
+	// 	handleClaimerAddresses()
+	// 		.catch(console.error);
+	// }, [hasClaimedNFT]);
 
 	// This useEffect grabs the # of token each member holds.
 	useEffect(() => {
