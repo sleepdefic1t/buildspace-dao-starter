@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { useWeb3 } from "@3rdweb/hooks";
 
 import { ThirdwebSDK } from "@3rdweb/sdk";
-import { UnsupportedChainIdError } from "@web3-react/core";
+// import { UnsupportedChainIdError } from "@web3-react/core";
 
 import pinwheelImg from "./assets/Pinwheel.png";
 
@@ -44,24 +44,42 @@ const App = () => {
 		return str.substring(0, 6) + "..." + str.substring(str.length - 4);
 	};
 
+	// This useEffect grabs all our the addresses of our members holding our NFT.
+	useEffect(() => {
+		if (!hasClaimedNFT) {
+			return;
+		}
 
-	// This useEffect grabs all the addresses of our members holding our NFT.
-	useEffect(async () => {
-	  if (!hasClaimedNFT) {
-	    return;
-	  }
-	  
-	  // Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
-	  // with tokenId 0.
-	  const memberAddresses = await bundleDropModule.getAllClaimerAddresses("0");
- 
-	  try {
-	    setMemberAddresses(memberAddresses);
-	    console.log("🚀 Members addresses", memberAddresses);
-	  } catch (error) {
-	    console.error("failed to get member list", error);
-	  }
+		// Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
+		// with tokenId 0.
+		bundleDropModule
+			.getAllClaimerAddresses("0")
+			.then((addresess) => {
+				console.log("🚀 Members addresses", addresess);
+				setMemberAddresses(addresess);
+			})
+			.catch((err) => {
+				console.error("failed to get member list", err);
+			});
 	}, [hasClaimedNFT]);
+
+	// // This useEffect grabs all the addresses of our members holding our NFT.
+	// useEffect(async () => {
+	//   if (!hasClaimedNFT) {
+	//     return;
+	//   }
+	//
+	//   // Just like we did in the 7-airdrop-token.js file! Grab the users who hold our NFT
+	//   // with tokenId 0.
+	//   const memberAddresses = await bundleDropModule.getAllClaimerAddresses("0");
+	// 
+	//   try {
+	//     setMemberAddresses(memberAddresses);
+	//     console.log("🚀 Members addresses", memberAddresses);
+	//   } catch (error) {
+	//     console.error("failed to get member list", error);
+	//   }
+	// }, [hasClaimedNFT]);
 
 	// // This useEffect grabs all our the addresses of our members holding our NFT.
 	// useEffect(() => {
