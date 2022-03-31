@@ -3,6 +3,8 @@ import { ChainId } from '@thirdweb-dev/sdk'
 import { useState, useEffect, useMemo } from 'react';
 import { AddressZero } from "@ethersproject/constants";
 
+import pinwheelImg from "./assets/Pinwheel.png";
+
 const App = () => {
   // Use the hooks thirdweb give us.
   const address = useAddress();
