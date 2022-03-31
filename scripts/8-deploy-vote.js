@@ -1,41 +1,40 @@
 import sdk from "./1-initialize-sdk.js";
 
-// Grab the app module address.
-const appModule = sdk.getAppModule(
-	"0x61Ae2556FA77ab5E5134f40e4C33fb2e095E8193"
-);
-
 (async () => {
-	try {
-		const voteModule = await appModule.deployVoteModule({
-			// Give your governance contract a name.
-			name: "PinwheelDAO's Epic Proposals",
+  try {
+    const voteContractAddress = await sdk.deployer.deployVote({
+      // Give your governance contract a name.
+		name: "Pinwheel DAO Proposals",
 
-			// This is the location of our governance token, our ERC-20 contract!
-			votingTokenAddress: "0x76e0EfEE498509F0d8Fe3B3D35973B5E7C3E6e66",
+      // This is the location of our governance token, our ERC-20 contract!
+      voting_token_address: "0x76e0EfEE498509F0d8Fe3B3D35973B5E7C3E6e66",
 
-			// After a proposal is created, when can members start voting?
-			// For now, we set this to immediately.
-			proposalStartWaitTimeInSeconds: 0,
+      // These parameters are specified in number of blocks. 
+      // Assuming block time of around 13.14 seconds (for Ethereum)
 
-			// How long do members have to vote on a proposal when it's created?
-			// Here, we set it to 24 hours (86400 seconds)
-			proposalVotingTimeInSeconds: 24 * 60 * 60,
+      // After a proposal is created, when can members start voting?
+      // For now, we set this to immediately.
+      voting_delay_in_blocks: 0,
 
-			// Will explain more below.
-			votingQuorumFraction: 0,
+      // How long do members have to vote on a proposal when it's created?
+      // we will set it to 1 day = 6570 blocks
+      voting_period_in_blocks: 6570,
 
-			// What's the minimum # of tokens a user needs to be allowed to create a proposal?
-			// I set it to 0. Meaning no tokens are required for a user to be allowed to
-			// create a proposal.
-			minimumNumberOfTokensNeededToPropose: "0",
-		});
+      // The minimum % of the total supply that need to vote for
+      // the proposal to be valid after the time for the proposal has ended.
+      voting_quorum_fraction: 0,
 
-		console.log(
-			"✅ Successfully deployed vote module, address:",
-			voteModule.address
-		);
-	} catch (err) {
-		console.error("Failed to deploy vote module", err);
-	}
+      // What's the minimum # of tokens a user needs to be allowed to create a proposal?
+      // I set it to 0. Meaning no tokens are required for a user to be allowed to
+      // create a proposal.
+      proposal_token_threshold: 0,
+    });
+
+    console.log(
+      "✅ Successfully deployed vote contract, address:",
+      voteContractAddress,
+    );
+  } catch (err) {
+    console.error("Failed to deploy vote contract", err);
+  }
 })();

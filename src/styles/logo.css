@@ -1,0 +1,41 @@
+.logo {
+	height: calc(10px + 9vmin);
+	max-height: 150px;
+	margin-right: 10px;
+}
+
+.logo:hover {
+	-webkit-transform: rotate(-1080deg);
+	-moz-transform: rotate(-1080deg);
+	-o-transform: rotate(-1080deg);
+	-ms-transform: rotate(-1080deg);
+	transform: rotate(-1080deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.logo {
+		-webkit-transition: all 1s ease;
+		-moz-transition: all 1s ease;
+		-o-transition: all 1s ease;
+		-ms-transition: all 1s ease;
+		transition: all 1s ease;
+		-webkit-animation: anim 10s linear;
+		-webkit-animation-iteration-count: 1;
+		animation: anim 1s linear;
+		animation-iteration-count: 1;
+		animation: logo-spin 1s ease-in-out;
+	}
+}
+
+@keyframes logo-spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		-webkit-transform: rotate(-1080deg);
+		-moz-transform: rotate(-1080deg);
+		-o-transform: rotate(-1080deg);
+		-ms-transform: rotate(-1080deg);
+		transform: rotate(-1080deg);
+	}
+}
