@@ -15,7 +15,7 @@ const App = () => {
   // Initialize our editionDrop contract
   const editionDrop = useEditionDrop("0x0f8482A6a7f79049a8115A9D4b400c6F891530B4");
   // Initialize our token contract
-  const token = useToken("0x7A665658444941cd96CF4de48Eab3")
+  const token = useToken("0x7A665658444941cd96CF4de48Eab368eb32eedb5")
   // Initialize our vote contract
   const vote = useVote("0x27cD9A3e16bA1468f7Bf5301486828dca6E7D5DF
 
