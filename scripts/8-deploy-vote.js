@@ -7,7 +7,7 @@ import sdk from "./1-initialize-sdk.js";
 		name: "Pinwheel DAO Proposals",
 
       // This is the location of our governance token, our ERC-20 contract!
-      voting_token_address: "0x76e0EfEE498509F0d8Fe3B3D35973B5E7C3E6e66",
+      voting_token_address: "0x7A665658444941cd96CF4de48Eab368eb32eedb5",
 
       // These parameters are specified in number of blocks. 
       // Assuming block time of around 13.14 seconds (for Ethereum)
