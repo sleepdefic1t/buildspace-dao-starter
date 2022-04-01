@@ -13,9 +13,9 @@ const App = () => {
   console.log("👋 Address:", address);
 
   // Initialize our editionDrop contract
-  const editionDrop = useEditionDrop("0x3622aD6e09DE656ee8cb70B1391B2FAB549F6A8A");
+  const editionDrop = useEditionDrop("0x0f8482A6a7f79049a8115A9D4b400c6F891530B4");
   // Initialize our token contract
-  const token = useToken("0x76e0EfEE498509F0d8Fe3B3D35973B5E7C3E6e66")
+  const token = useToken("0x7A665658444941cd96CF4de48Eab3")
   // Initialize our vote contract
   const vote = useVote("0x3dD5ac1cBe006d761D16022C3dC7571e00c66A8a");
 
